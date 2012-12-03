@@ -15,21 +15,21 @@ currTime=0
 
 #FCFS NEEDS TO BE FIXED
 if [[ ${1} = "FCFS" ]]; then   
-  proccess=0
+  process=0
   while [[ ${current[@]} ]]; do
     #while there are processes still left
     for y in ${current[@]}; do
       #loop through avail processes
       if (( at[$y] <= currTime )); then
         #check to see if the process has arrived
-        proccess=$y
-        schedule[$currTime]=$proccess
+        process=$y
+        schedule[$currTime]=$process
         (( currTime++ ))
-        (( et[$proccess]-- ))
-        if(( et[$proccess] == 0 )); then
-          #if the proccess has completed, unset from array
-          ft[$proccess]=$currTime
-          unset current[$proccess]
+        (( et[$process]-- ))
+        if(( et[$process] == 0 )); then
+          #if the process has completed, unset from array
+          ft[$process]=$currTime
+          unset current[$process]
         fi
         break
       else
@@ -46,11 +46,11 @@ elif [[ ${1} = "SRT" ]]; then
   while [[ ${current[@]} ]]; do
     #while there are processes still left
     if(( et[$shortest] == 0 )); then
-      #if the proccess has completed, unset from array
+      #if the process has completed, unset from array
       ft[$shortest]=$currTime
       unset current[$shortest]
       for x in ${current[@]}; do
-        #set shortest to first index in array of current proccesses
+        #set shortest to first index in array of current processes
         shortest=$x
         break
       done
@@ -58,7 +58,7 @@ elif [[ ${1} = "SRT" ]]; then
     for y in ${current[@]}; do
       #loop through processes that are still available
       if (( at[$y] <= currTime )); then
-        #has this proccess arrived yet?
+        #has this process arrived yet?
         if (( et[$y] < et[$shortest] )); then
           #set shortest process index
           shortest=$y            
@@ -67,8 +67,7 @@ elif [[ ${1} = "SRT" ]]; then
     done
   
     if (( et[$shortest] >= 0 )); then
-      print "Current Time: $currTime"
-      print "\tProcess ID: ${id[$shortest]}"
+
       if (( at[$shortest] <= $currTime )); then
         schedule[$currTime]=$shortest
         (( et[$shortest]-- ))
@@ -84,9 +83,13 @@ else
   return
 fi
 #print results
+currTime=0
 for x in ${schedule[@]}; do
-  #need to format the results
-  echo $x
+  echo "${id[$x]}"
+  process_id="${id[$x]}"
+  print "Current Time: $currTime"
+  print "\tProcess ID: $process_id"
+  (( currTime++ ))
 done
 #calculate stats
 let total=${#id[@]}-1
