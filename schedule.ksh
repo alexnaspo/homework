@@ -19,10 +19,12 @@ if [[ ${1} = "FCFS" ]]; then
   do
     for c in {1..${et[$i]}}
       do
+        if (( at[$y] <= currTime )); then
           print "Current Time: $currTime"
           print "\tProcess Id: $x"
           ((currTime++))
           integer ft[i]=$currTime
+        fi
       done
     ((i++))
   done
@@ -51,14 +53,22 @@ elif [[ ${1} = "SRT" ]]; then
         fi
       fi
     done
-    (( et[$shortest]-- ))
+  
     if (( et[$shortest] >= 0 )); then
       print "Current Time: $currTime"
       print "\tProcess ID: ${id[$shortest]}"
-      schedule[$currTime]=$y
-      
+      if (( at[$shortest] <= $currTime )); then
+        schedule[$currTime]=$shortest
+        (( et[$shortest]-- ))
+      else
+        schedule[$currTime]="NONE"
+      fi      
       (( currTime++ ))
     fi
+  done
+
+  for x in ${schedule[@]}; do
+    echo $x
   done
 
 else 
