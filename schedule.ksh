@@ -1,5 +1,6 @@
 #!/bin/ksh
-file="/Users/Alex/CompSci/homework/processes.txt"
+#file="/Users/Alex/CompSci/homework/processes.txt"
+file=${1}
 i=0
 cat $file | while IFS=': \;' read -r f1 f2 f3 f4 f5 f6  
 do 
@@ -14,7 +15,7 @@ done
 currTime=0
 
 #FCFS 
-if [[ ${1} = "FCFS" ]]; then   
+if [[ ${2} = "FCFS" ]]; then   
   process=0
   while [[ ${current[@]} ]]; do
     #while there are processes still left
@@ -41,7 +42,7 @@ if [[ ${1} = "FCFS" ]]; then
   done
 
 #SRT
-elif [[ ${1} = "SRT" ]]; then
+elif [[ ${2} = "SRT" ]]; then
   shortest=0
   while [[ ${current[@]} ]]; do
     #while there are processes still left
@@ -55,6 +56,10 @@ elif [[ ${1} = "SRT" ]]; then
         break
       done
     fi
+    if (( ${#current[@]} == 0 )); then
+      #if the final process was finished kill the while loop
+      break
+    fi
     for y in ${current[@]}; do
       #loop through processes that are still available
       if (( at[$y] <= currTime )); then
@@ -67,7 +72,6 @@ elif [[ ${1} = "SRT" ]]; then
     done
 
     if (( et[$shortest] >= 0 )); then
-
       if (( at[$shortest] <= $currTime )); then
         schedule[$currTime]=$shortest
         (( et[$shortest]-- ))
