@@ -9,7 +9,6 @@ do
   typeset -E servicetime[i]="$f6" #service time for final calculations
   integer rt[i]=0 #run time so far
   integer current[i]=i
-
   ((i++))
 done
 currTime=0
@@ -18,10 +17,11 @@ currTime=0
 if [[ ${1} = "FCFS" ]]; then   
   proccess=0
   while [[ ${current[@]} ]]; do
-    echo "AVAIL PROJECTS ${current[@]}"
+    #while there are processes still left
     for y in ${current[@]}; do
+      #loop through avail processes
       if (( at[$y] <= currTime )); then
-        echo "${id[$y]} ran"
+        #check to see if the process has arrived
         proccess=$y
         schedule[$currTime]=$proccess
         (( currTime++ ))
@@ -32,21 +32,13 @@ if [[ ${1} = "FCFS" ]]; then
           unset current[$proccess]
         fi
         break
-        
       else
         schedule[$currTime]="NONE"
-        echo "NO PROCESS AVAIL"
         (( currTime++ ))
         break
-        
       fi
     done
   done
-
-  for x in ${schedule[@]}; do
-    echo $x
-  done
-
 
 #SRT
 elif [[ ${1} = "SRT" ]]; then
@@ -87,14 +79,15 @@ elif [[ ${1} = "SRT" ]]; then
     fi
   done
 
-  for x in ${schedule[@]}; do
-    echo $x
-  done
-
 else 
   echo "Please supply FCFS or SRT as an arg"
   return
 fi
+#print results
+for x in ${schedule[@]}; do
+  #need to format the results
+  echo $x
+done
 #calculate stats
 let total=${#id[@]}-1
 for y in {0..$total}; do
@@ -105,7 +98,7 @@ for y in {0..$total}; do
   echo "Process ID: ${id[$y]}"
   echo "Turnaround Time: $turnaround"
   echo "Tr/Ts: $TrTs"
-  echo "Throughput: HARD CODED"
-  echo "Processor Utilization: HARD CODED"
+  echo "Throughput: HARD CODED" #WTF IS THIS
+  echo "Processor Utilization: HARD CODED" #WTF IS THIS
   echo "======================"
 done
