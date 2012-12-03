@@ -71,7 +71,7 @@ elif [[ ${2} = "SRT" ]]; then
       fi
     done
 
-    if (( et[$shortest] >= 0 )); then
+    if (( et[$shortest] >= 0 )); then #might not be needed
       if (( at[$shortest] <= $currTime )); then
         schedule[$currTime]=$shortest
         (( et[$shortest]-- ))
@@ -89,7 +89,11 @@ fi
 #print results
 currTime=0
 for x in ${schedule[@]}; do
-  process_id="${id[$x]}"
+  if (( $x == "NONE")); then
+    process_id=$x
+  else
+    process_id="${id[$x]}"
+  fi
   print "Current Time: $currTime"
   print "\tProcess ID: $process_id"
   (( currTime++ ))
