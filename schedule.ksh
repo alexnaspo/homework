@@ -37,9 +37,9 @@ if [[ ${1} = "FCFS" ]]; then
   done
 elif [[ ${1} = "SRT" ]]; then
   file="/Users/Alex/CompSci/homework/processes.txt"
-  IFS=': \;'
+
   i=0
-  while read -r f1 f2 f3 f4 f5 f6  
+  cat $file | while IFS=': \;' read -r f1 f2 f3 f4 f5 f6  
     do 
       integer id[i]="$f2"
       integer at[i]="$f4" #arrival time
@@ -48,104 +48,43 @@ elif [[ ${1} = "SRT" ]]; then
       integer current[i]=i
 
       ((i++))
-    done <"$file"
-
-  integer curr_index=0
-  integer currTime=0
-  let totalProcesses=${#at[@]}
-  let totalProcesses=totalProcesses-1
-  let totalRunTime=0
-  for x in ${et[@]}; do
-    let totalRunTime+=$x
-
-  done 
-
-  
-    currTime=0
-    shortest=0
-    
-    while [[ ${current[@]} ]]; do
-
-      echo "${current[@]} current proccess"
-      echo "$currTime current time"
-      if(( et[$shortest] == 0 )); then
-        
-
-        unset current[$shortest]
-        let next=shortest+1
-        echo "CURRENT index ZERO ${current[1]}"
-        
-        for x in ${current[@]}; do
-          shortest=$x
-          break
-        done
-        # echo "SHORTEST ${et[$shortest]}"
-      fi
-      echo "====================="
-      echo "====================="
-      for y in ${current[@]}; do
-
-        echo "current program ID: ${id[$y]}"
-        if (( at[$y] <= currTime )); then
-          
-          # echo "${et[$y]} <= et[$shortest] "
-          if (( et[$y] <= et[$shortest] )); then
-            shortest=$y
-            #check if is this the last element in the for lopp
-            #add element to array
-
-           
-              # print "\t\tcurrent time: $currTime"
-              # print "\t\t\tcurrent process: ${id[$shortest]}"
-
-              
-
-
-          fi
-        fi
-      done
-      echo "ID:${id[$shortest]} ET:${et[$shortest]} "
-       schedule[$currTime]=$y
-            (( et[$shortest]-- ))
-            (( currTime++ ))
-            
-
     done
 
 
-    # for c in ${schedule[@]}; do
-    #   echo "${id[c]}"
-    # done
+    currTime=0
+    shortest=0
+    while [[ ${current[@]} ]]; do
+      #while there are processes still left
 
-    # for y in ${current[@]}; do
-    #   if (( rt[$y] < et[$y] )); then
-    #     #if the program is not finished, keep going
-    #     if (( at[$y] < $currTime )); then
-    #       #if the program is in que, keep going
-    #       let diff=et[$y]-rt[$y]
-    #       let currDiff=et[$curr_index]-rt[$curr_index]          
-    #       if (( et[$y] <= et[$curr_index] )); then #is this broken?
-    #         curr_index=$y
-    #       fi
-    #     fi
-    #   else
-    #     #echo "${id[$y]} RAN ${rt[$y]} out of ${et[$y]} seconds"
+      if(( et[$shortest] == 0 )); then
+        #if the proccess has completed, unset from array
+        unset current[$shortest]
+        for x in ${current[@]}; do
+          #set shortest to first index in array of current proccesses
+          shortest=$x
+          break
+        done
+      fi
+      for y in ${current[@]}; do
+        #loop through processes that are still available
+        if (( at[$y] <= currTime )); then
+          #has this proccess arrived yet?
+          if (( et[$y] < et[$shortest] )); then
+            #set shortest process index
+            shortest=$y            
+          fi
+        fi
+      done
+      (( et[$shortest]-- ))
+      if (( et[$shortest] >= 0 )); then
+        print "Current Time: $currTime"
+        print "\tProcess ID: ${id[$shortest]}"
+        schedule[$currTime]=$y
         
-    #     unset current[$y]
-    #   fi
-    # done
-  
-  
-  
-    # echo "================================="
+        (( currTime++ ))
+      fi
+    done  
     
-    # ((rt[$curr_index]++))
-    # print "\t\tcurrent time: $i"
-    # print "\t\t\tcurrent process: ${id[$curr_index]}"
-    # echo "================================="
-  
-
-  
 else 
   echo "Please supply FCFS or SRT as an arg"
 fi
