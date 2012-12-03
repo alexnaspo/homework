@@ -13,7 +13,7 @@ do
 done
 currTime=0
 
-#FCFS NEEDS TO BE FIXED
+#FCFS 
 if [[ ${1} = "FCFS" ]]; then   
   process=0
   while [[ ${current[@]} ]]; do
@@ -65,7 +65,7 @@ elif [[ ${1} = "SRT" ]]; then
         fi
       fi
     done
-  
+
     if (( et[$shortest] >= 0 )); then
 
       if (( at[$shortest] <= $currTime )); then
@@ -85,7 +85,6 @@ fi
 #print results
 currTime=0
 for x in ${schedule[@]}; do
-  echo "${id[$x]}"
   process_id="${id[$x]}"
   print "Current Time: $currTime"
   print "\tProcess ID: $process_id"
