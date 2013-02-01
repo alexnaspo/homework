@@ -1,6 +1,7 @@
 #!/bin/ksh
-#file="/Users/Alex/CompSci/homework/processes.txt"
-file=${1}
+# Alexander Naspo
+# CS 332
+file="./processes.txt"
 i=0
 cat $file | while IFS=': \;' read -r f1 f2 f3 f4 f5 f6  
 do 
@@ -13,9 +14,10 @@ do
   ((i++))
 done
 currTime=0
+util=0 #for calculation of processor utilization
 
 #FCFS 
-if [[ ${2} = "FCFS" ]]; then   
+if [[ ${1} = "FCFS" ]]; then   
   process=0
   while [[ ${current[@]} ]]; do
     #while there are processes still left
@@ -24,9 +26,11 @@ if [[ ${2} = "FCFS" ]]; then
       if (( at[$y] <= currTime )); then
         #check to see if the process has arrived
         process=$y
-        schedule[$currTime]=$process
+        schedule[$currTime]=${id[$process]}
+        #process ran successfully, increment and decrement required variables
         (( currTime++ ))
         (( et[$process]-- ))
+        (( util++ ))
         if(( et[$process] == 0 )); then
           #if the process has completed, unset from array
           ft[$process]=$currTime
@@ -42,7 +46,7 @@ if [[ ${2} = "FCFS" ]]; then
   done
 
 #SRT
-elif [[ ${2} = "SRT" ]]; then
+elif [[ ${1} = "SRT" ]]; then
   shortest=0
   while [[ ${current[@]} ]]; do
     #while there are processes still left
@@ -71,9 +75,10 @@ elif [[ ${2} = "SRT" ]]; then
       fi
     done
 
-    if (( et[$shortest] >= 0 )); then #might not be needed
+    if (( et[$shortest] >= 0 )); then #solves issue with last time slice
       if (( at[$shortest] <= $currTime )); then
-        schedule[$currTime]=$shortest
+        schedule[$currTime]=${id[$shortest]}
+        (( util++ ))
         (( et[$shortest]-- ))
       else
         schedule[$currTime]="NONE"
@@ -83,19 +88,19 @@ elif [[ ${2} = "SRT" ]]; then
   done
 
 else 
-  echo "Please supply FCFS or SRT as an arg"
+  echo "Please supply one of the two following parameters"
+  print "\tFCFC to implement the First Come first Serve Algorithm"
+  print "\tSRT to implement the Shortest Remaining Time Algorithm"
   return
 fi
 #print results
+
 currTime=0
+
 for x in ${schedule[@]}; do
-  if (( $x == "NONE")); then
-    process_id=$x
-  else
-    process_id="${id[$x]}"
-  fi
+
   print "Current Time: $currTime"
-  print "\tProcess ID: $process_id"
+  print "\tProcess ID: $x"
   (( currTime++ ))
 done
 #calculate stats
@@ -108,7 +113,12 @@ for y in {0..$total}; do
   echo "Process ID: ${id[$y]}"
   echo "Turnaround Time: $turnaround"
   echo "Tr/Ts: $TrTs"
-  echo "Throughput: HARD CODED" #WTF IS THIS
-  echo "Processor Utilization: HARD CODED" #WTF IS THIS
   echo "======================"
 done
+
+typeset -E currTime=$currTime #floating point
+let throughput=$((total/currTime)) 
+let util=$(((util/currTime) * 100))
+echo "Processor Calcuations:"
+print "\tThroughput: $throughput" 
+print "\tProcessor Utilization:$util%" 
