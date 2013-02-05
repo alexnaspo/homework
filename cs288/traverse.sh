@@ -16,14 +16,12 @@ function traverse(){
 
 function main(){
     count=0
-    local dir=$1
-    traverse $dir 
-
+    traverse $1
 }
 
 function count(){
     count=`expr $count + 1`
-
 }
 
 main $1
+echo $count

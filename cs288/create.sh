@@ -17,7 +17,6 @@ function create(){
             tmp_open=(${tmp_open[@]} ${tmp[@]})
         done
         closed=(${closed[@]} ${tmp[@]})
-        #todo - set closed array HERE
         open=${tmp_open[@]}
         i=`expr $i + 1`
     done
