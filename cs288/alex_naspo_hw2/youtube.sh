@@ -1,9 +1,9 @@
 curl -o index.html http://www.youtube.com/index
+
 grep data-context-item index.html | while read x; do 
   user=`expr "$x" : ".*data-context-item-user=\"\([^\"]*\)\".*"`
   echo $user
 done > user.txt
-
 
 grep data-context-item index.html | while read x; do 
   views=`expr "$x" : ".*data-context-item-views=\"\(.*\) views\".*"`
