@@ -6,18 +6,18 @@
 void insert_user(char *s);
 
 struct clip {
- char *user;
- char *duration;
- char *title;
- char *id;
- int views;
+  char *user;
+  char *duration;
+  char *title;
+  char *id;
+  int views;
 
- struct clip *next;
+  struct clip *next;
 };
 
 int main(int argc, char **argv){
   FILE *fp = fopen("users.txt", "r");
-  char line[999];
+  char line[100];
   struct clip *head;
   head = NULL;
   while (fgets(line, sizeof(line), fp)) {
