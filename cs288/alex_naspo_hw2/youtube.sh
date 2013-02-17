@@ -1,7 +1,9 @@
+curl -o index.html http://www.youtube.com/index
 grep data-context-item index.html | while read x; do 
-  user=`expr "$x" : ".*data-context-item-user=\"\(.*\)\" data.*"`
+  user=`expr "$x" : ".*data-context-item-user=\"\([^\"]*\)\".*"`
   echo $user
 done > user.txt
+
 
 grep data-context-item index.html | while read x; do 
   views=`expr "$x" : ".*data-context-item-views=\"\(.*\) views\".*"`
@@ -9,12 +11,12 @@ grep data-context-item index.html | while read x; do
 done > views.txt
 
 grep data-context-item index.html | while read x; do 
-  duration=`expr "$x" : ".*data-context-item-time=\"\([0-9:]*\)\" data-context.*"`
+  duration=`expr "$x" : ".*data-context-item-time=\"\([0-9:]*\)\".*"`
   echo $duration
 done > duration.txt
 
 grep data-context-item index.html | while read x; do 
-  title=`expr "$x" : ".*data-context-item-title=\"\(.*\)\""`
+  title=`expr "$x" : ".*data-context-item-title=\"\([^\"]*\)\".*"`
   echo $title
 done > title.txt
 

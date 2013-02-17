@@ -1,3 +1,0 @@
-Bloomberg
-  1.Given an array with consecutive random integers 1 to 100. After taking one random value out of the array, determine which integer was taken out
-  2. How to find the count of a linked list that ends with a loop of any size
