@@ -38,7 +38,6 @@ int main() {
 
   // Do forever 
   while (1 == 1) {
-    
     // accept a connection request from client
     /* First, create a sockaddr_in struct to hold the address of the client.  
                    Then, create a NEW socket (called clientSock) to talk to the client and connect it to the client socket.   

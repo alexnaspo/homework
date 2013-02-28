@@ -8,7 +8,7 @@ done > user.txt
 grep data-context-item index.html | while read x; do 
   views=`expr "$x" : ".*data-context-item-views=\"\(.*\) views\".*"`
   echo ${views//,/}
-done > views.txt
+done
 
 grep data-context-item index.html | while read x; do 
   duration=`expr "$x" : ".*data-context-item-time=\"\([0-9:]*\)\".*"`

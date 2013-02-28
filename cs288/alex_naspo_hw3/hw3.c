@@ -1,53 +1,64 @@
 #include <stdio.h>
-#include <malloc/malloc.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-void insert_user(char *s);
+#define LINE_LENGTH 100
+
+void build_a_lst(),print_a_line(),print_lst();
+void insert_at_end();
 
 struct clip {
-  char *user;
-  char *duration;
-  char *title;
-  char *id;
   int views;
-
+  char *user;
+  char *id;
+  char *title;
   struct clip *next;
-};
+} *head;
 
-int main(int argc, char **argv){
-  FILE *fp = fopen("users.txt", "r");
-  char line[100];
-  struct clip *head;
-  head = NULL;
-  while (fgets(line, sizeof(line), fp)) {
-    
-    struct clip *tp, *cur;
-    char *user;
+int main(int argc, char **argv) {
+  build_a_lst(*(argv+1));
+  print_lst(head);    /* prints all the users */
 
-    tp = malloc(sizeof(struct clip));
-    tp->user = malloc(strlen(line));
-    strcpy(tp->user, line);
-
-    tp->next = NULL;
-    cur = head;
-
-    if(head == NULL){
-      head = tp;
-    } else {
-      while(cur->next != NULL){
-        cur = cur->next;
-      }
-      cur->next = tp;
-    }
-  }
-
-  struct clip *temp;
-
-  temp = head;
-  while(temp->next != NULL){
-    printf("%s\n", temp->user);
-    temp = temp->next;
-  }
   return 0;
 }
+
+void build_a_lst(char *fn) {  
+  FILE *fp;
+  char line[LINE_LENGTH];
+  if ((fp = fopen(fn,"r")) != NULL) {
+    while (fgets(line, LINE_LENGTH, fp) != NULL) {
+      insert_at_end(line);  /* insert a user at end of the list */
+    }
+    fclose (fp);
+  }
+}
+
+void insert_at_end(char *s) {
+  //create clip
+  struct clip *tp, *cp;
+  tp = malloc(sizeof(struct clip));
+  tp->user = malloc(strlen(s));
+  strcpy(tp->user, s);
+  tp->next = NULL;
+
+  //traverse and add
+  cp = head;
+  if(head == NULL){
+    head = tp;
+  } else {
+    while(cp->next != NULL){
+      cp = cp->next;
+    }
+    cp->next = tp;
+  }  
+}
+
+/* prints all the users */
+void print_lst(struct clip *cp) {
+  while(cp->next != NULL){
+    cp = cp->next;
+    printf("%s\n", cp->user);
+  }
+}
+
+/* end */

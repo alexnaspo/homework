@@ -8,9 +8,10 @@ function create(){
         for x in ${open[@]}; do
             tmp_open=()
             j=1
+            echo "========="
             while [[ $j -le $breadth ]]; do
                 echo $x/$j 'created'
-                `mkdir -p $x/$j`
+                # `mkdir -p $x/$j`
                 tmp=( ${tmp[@]} $x/$j)
                 j=`expr $j + 1`                
             done

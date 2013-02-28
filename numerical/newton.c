@@ -5,7 +5,7 @@ double newt(double x);
 
 int main(){
   double answer;
-  answer = newt(0.1);
+  answer = newt(2);
   printf("Montly rate: %f\n", answer);
   printf("APR:%f\n", (answer * 1200));
 }
@@ -28,5 +28,4 @@ double newt(double x){
     return x;
   else
     return newt(gx);
-  
 }
