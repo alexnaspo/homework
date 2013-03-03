@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// #include <unistd.h>
-// #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -30,6 +28,7 @@ int main(int argc, char *argv[])
   server_address.sin_port = htons(port_num);
 
   if (bind(socket_one, (struct sockaddr *) &server_address, sizeof(server_address)) < 0){
+    //bind fails
     printf("%s\n", "Connection error"); 
   }
   
@@ -49,6 +48,7 @@ int main(int argc, char *argv[])
     printf("%s\n", "Error occured writing to socket");
   }
 
+  printf("%s\n", "Closing Sockets");
   close(new_socket);
   close(socket_one);    
 
