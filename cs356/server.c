@@ -43,14 +43,14 @@ int main(int argc, char *argv[])
 
   bzero(msg_buffer, 256);
   temp = read(new_socket, msg_buffer, 255);
-  // if (n < 0) {
+  // if (temp < 0) {
   //   printf("%s\n", "ERROR reading from socket");
   // }
 
   printf("Response message: %s\n",msg_buffer);
   temp = write(new_socket, "I got your message",18);
 
-  if (n < 0) {
+  if (temp < 0) {
     printf("%s\n", "ERROR writing to socket");
   }
 
