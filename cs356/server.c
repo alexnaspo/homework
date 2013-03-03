@@ -8,13 +8,15 @@ int main(int argc, char *argv[])
 {
   struct sockaddr_in server_address, client_address;
   int socket_one, new_socket, port_num, temp;
-  socklen_t clilen;
+  socklen_t client_len;
   char msg_buffer[256];
 
   if (argc < 2)
   {
     printf("%s\n", "Please provide the port number");
+    exit(0);
   }
+
   socket_one = socket(AF_INET, SOCK_STREAM, 0);
   if( socket_one < 0) {
     printf("%s\n", "Error creating the socket");
@@ -34,8 +36,8 @@ int main(int argc, char *argv[])
   
   listen(socket_one, 5);
   printf("%s\n", "Waiting for Message...");
-  clilen = sizeof(client_address);
-  new_socket = accept(socket_one, (struct sockaddr *) &client_address, &clilen);
+  client_len = sizeof(client_address);
+  new_socket = accept(socket_one, (struct sockaddr *) &client_address, &client_len);
 
   //set msg_buffer values to 0, then save message
   bzero(msg_buffer, 256);
