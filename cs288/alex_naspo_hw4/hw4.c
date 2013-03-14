@@ -11,23 +11,22 @@ void int_radix_sort();
 struct clip {
   int views;
   char *user;
-  char *id;
+  char *duration;
   char *title;
   struct clip *next;
 } *head;
 
 int main(int argc, char **argv) {
   build_a_lst(*(argv+1));
-  print_lst(head);    /* prints the table */
-  // int_radix_sort(head);
-  // print_lst(head);    /* prints the table but now sorted */
+  //print_lst(head);    /* prints the table */
+  int_radix_sort(head);
+  //print_lst(head);    /* prints the table but now sorted */
   return 0;
 }
 
 void build_a_lst(char *fn) {
   FILE *fp;
   char line[LINE_LENGTH];
-  //  char *line;
   if ((fp = fopen(fn,"r")) != NULL) {
     while (fgets(line, LINE_LENGTH, fp) != NULL) {
       insert_at_end(line);  /* insert a user at end of the list */
@@ -48,23 +47,28 @@ void insert_at_end(char *s) {
   int i = 0;
   while( result != NULL ) {
       arr[i] = result;
+  
       result = strtok( NULL, delims );
-      // printf("%s\n", arr[i]);
-      // printf("%s\n", "---------------");
       i++; 
   }
+  
 
   struct clip *tp, *cp;
 
   tp = malloc(sizeof(struct clip));
-
-  tp->views = (int)arr[0];
-
+  
+  tp->views = atoi(arr[0]);
+  
   tp->user = malloc(strlen(arr[1]));
   strcpy(tp->user, arr[1]);
+
+  tp->duration = malloc(strlen(arr[1]));
+  strcpy(tp->duration, arr[2]);
   
   tp->title = malloc(strlen(arr[3]));
-  strcpy(tp->title, arr[3]);
+  strcpy(tp->title, arr[3]); //need to convert MY_COMMA back to comma
+
+  // free(arr);
 
   tp->next = NULL;
 
@@ -77,7 +81,7 @@ void insert_at_end(char *s) {
       cp = cp->next;
     }
     cp->next = tp;
-  }  
+  }
 
 
 }
@@ -87,18 +91,68 @@ void int_radix_sort(struct clip *cp) {
     you will need a wrapper here for radix_sort only, without having to involve
     struct clip or linked list
   */
-  // we'll talk more on this on Thur, 3/7/2013
-  // FILL IN
-  // ...
-  // FILL IN
+  int rnd = 0;
+  int cnt[9999];
+  int map[9999];
+  int buf[9999];
+  int lst[9999];
+  int i = 0;
+  int j;
+  int c;
+  int bucket = 16;
+  int mask = bucket - 1;
+  // 0 out bucket?
+
+  while(cp->next != NULL){
+    lst[i] = cp->views;
+    cp = cp->next;
+    i = i + 1;
+  }
+
+  int n = i;
+
+  for (int i = 0; i < n; ++i)
+  { 
+    // printf("%x\n", lst[i]);
+    // printf("%x\n", (lst[i] >> 4 * rnd & mask));
+    // printf("%s\n", "");
+  }  
+  map[0] = 0;
+
+  for (i = 0; i < n; ++i)
+  {
+    cnt[(lst[i] >> 4 * rnd) & mask]++;
+  }
+  
+  for (i = 0; i < bucket; i++) {   
+    map[i] = map[i-1] + cnt[i-1];
+  }
+
+  for (j = 0; j < n; j++)
+  {
+    buf[map[(lst[j] >> (4 * rnd)) & mask]++] = lst[j];   
+  }
+  printf("%s\n", "=======");  
+
+  for (c = 0; c < n; c++){
+    printf("%x\n", buf[c]);
+  }
+
+    
+
 }
+
+
 
 
 /* prints all the users */
 void print_lst(struct clip *cp) {
   while(cp->next != NULL){
     cp = cp->next;
-    printf("%s\n", cp->user);
+    // printf("%s\n", cp->user);
+    // printf("%s\n", cp->duration);
+    // printf("%s\n", cp->title);
+    printf("%i\n", cp->views);
   }
 }
 
