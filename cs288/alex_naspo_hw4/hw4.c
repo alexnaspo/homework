@@ -101,7 +101,7 @@ void int_radix_sort(struct clip *cp) {
   int c;
   int bucket = 16;
   int mask = bucket - 1;
-  // 0 out bucket?
+  int flag = 0;
 
   while(cp->next != NULL){
     lst[i] = cp->views;
@@ -110,40 +110,74 @@ void int_radix_sort(struct clip *cp) {
   }
 
   int n = i;
+  // need to rotate desination/source each time
+  // aka rotate lst/buffer
+  // should have a flag
+   
+  
+  while(rnd < n){ 
+    for (i = 0; i < bucket; ++i)
+    { 
+      map[i] = 0;
+      cnt[i] = 0;
+    } 
+    
+    for (i = 0; i < n; ++i)
+    {
+      if(flag == 0) { 
+        // printf("%x\n", lst[i]);
+        // printf("%x\n", (lst[i] >> 4 * rnd & mask));
+        // printf("%s\n", "");        
+        cnt[(lst[i] >> 4 * rnd) & mask]++;
+      }
+      else {
+        // printf("%x\n", buf[i]);
+        // printf("%x\n", (buf[i] >> 4 * rnd & mask));
+        // printf("%s\n", "");        
+        cnt[(buf[i] >> 4 * rnd) & mask]++;
+      }
+    }
 
-  for (int i = 0; i < n; ++i)
-  { 
-    // printf("%x\n", lst[i]);
-    // printf("%x\n", (lst[i] >> 4 * rnd & mask));
-    // printf("%s\n", "");
-  }  
-  map[0] = 0;
+    for (i = 0; i < bucket; ++i)
+    {
+      // printf("%i\n", cnt[i]);
+    }
+    
+    for (i = 0; i < bucket; i++) {   
+      map[i] = map[i-1] + cnt[i-1];
+    }
 
-  for (i = 0; i < n; ++i)
-  {
-    cnt[(lst[i] >> 4 * rnd) & mask]++;
+    for (j = 0; j < n; j++)
+    {
+      if(flag == 0) { 
+        buf[map[(lst[j] >> (4 * rnd)) & mask]++] = lst[j];   
+      } else {
+        lst[map[(buf[j] >> (4 * rnd)) & mask]++] = buf[j];   
+      }
+    }
+    printf("%s\n", "=======");      
+
+    if (flag == 0)
+    {
+      flag = 1; 
+      printf("%s\n", "buf");
+      for (c = 0; c < n; c++){
+        
+        printf("%i\n", buf[c]);
+      }      
+    } else {
+      flag = 0;
+      printf("%s\n", "list");
+      for (c = 0; c < n; c++){
+        printf("%i\n", lst[c]);
+      }
+    }
+    rnd = rnd + 1;
+    printf("%s\n", "=======");  
   }
   
-  for (i = 0; i < bucket; i++) {   
-    map[i] = map[i-1] + cnt[i-1];
-  }
-
-  for (j = 0; j < n; j++)
-  {
-    buf[map[(lst[j] >> (4 * rnd)) & mask]++] = lst[j];   
-  }
-  printf("%s\n", "=======");  
-
-  for (c = 0; c < n; c++){
-    printf("%x\n", buf[c]);
-  }
-
-    
 
 }
-
-
-
 
 /* prints all the users */
 void print_lst(struct clip *cp) {
