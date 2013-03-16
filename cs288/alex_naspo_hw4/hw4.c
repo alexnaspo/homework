@@ -53,8 +53,6 @@ void insert_at_end(char *s) {
       result = strtok( NULL, delims );
       i++; 
   }
-  
-
   struct clip *tp, *cp;
 
   tp = malloc(sizeof(struct clip));
@@ -70,8 +68,6 @@ void insert_at_end(char *s) {
   tp->title = malloc(strlen(arr[3]));
   strcpy(tp->title, arr[3]); //need to convert MY_COMMA back to comma
 
-  // free(arr);
-
   tp->next = NULL;
 
   //traverse and add
@@ -83,10 +79,7 @@ void insert_at_end(char *s) {
       cp = cp->next;
     }
     cp->next = tp;
-
   }
-
-
 }
 
 void int_radix_sort(struct clip *cp) {
@@ -99,16 +92,20 @@ void int_radix_sort(struct clip *cp) {
   int i = 0;
   int flag = 0;
   int rnd = 0;
-
+  i = 1;
+  source[0] = cp;
   while(cp->next != NULL){
-    source[i] = cp;
     cp = cp->next;
+    source[i] = cp;
     i = i + 1;
   }
+  source[i] = cp;
+  // @ERROR missing the last node from the original linked list
+  // printf("%i\n", source[i]->views);
 
   int n = i;
 
-  while (rnd < n){
+  while (rnd < n - 1 ){
     if (flag == 0) {
       radix_wrapper(source, dest, n, rnd);
       flag = 1;  
@@ -157,9 +154,7 @@ void radix_wrapper(struct clip *source[], struct clip *dest[], int n, int rnd){
   for (i = 0; i < n; i++) {
     dest[map[(source[i]->views >> (8 * rnd)) & mask]++] = source[i];  
   }
-
 }
-
 /* prints all the users */
 void print_lst(struct clip *cp) {
   printf("%i\n", cp->views);
@@ -173,5 +168,4 @@ void print_lst(struct clip *cp) {
     
   }
 }
-
 /* end */
