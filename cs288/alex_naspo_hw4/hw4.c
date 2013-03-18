@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <regex.h> 
+#include <string.h> 
 
 #define LINE_LENGTH 100
 
@@ -39,7 +38,6 @@ void build_a_lst(char *fn) {
 }
 
 void insert_at_end(char *s) {
-  regex_t re;
   // split s into four fields and insert all of them
   // views need to be converted to int using atoi(views_str)
   //create clip
