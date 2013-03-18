@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <regex.h> 
 
 #define LINE_LENGTH 100
 
@@ -21,7 +22,7 @@ int main(int argc, char **argv) {
   build_a_lst(*(argv+1));
   print_lst(head);    /* prints the table */
   int_radix_sort(head);
-  printf("%s\n", "=========");
+  printf("%s\n", "=====SORT=====");
   print_lst(head);    /* prints the table but now sorted */
   return 0;
 }
@@ -38,6 +39,7 @@ void build_a_lst(char *fn) {
 }
 
 void insert_at_end(char *s) {
+  regex_t re;
   // split s into four fields and insert all of them
   // views need to be converted to int using atoi(views_str)
   //create clip
@@ -49,7 +51,6 @@ void insert_at_end(char *s) {
   int i = 0;
   while( result != NULL ) {
       arr[i] = result;
-  
       result = strtok( NULL, delims );
       i++; 
   }
@@ -62,7 +63,7 @@ void insert_at_end(char *s) {
   tp->user = malloc(strlen(arr[1]));
   strcpy(tp->user, arr[1]);
 
-  tp->duration = malloc(strlen(arr[1]));
+  tp->duration = malloc(strlen(arr[2]));
   strcpy(tp->duration, arr[2]);
   
   tp->title = malloc(strlen(arr[3]));
@@ -93,6 +94,7 @@ void int_radix_sort(struct clip *cp) {
   int flag = 0;
   int rnd = 0;
   i = 1;
+
   source[0] = cp;
   while(cp->next != NULL){
     cp = cp->next;
@@ -100,8 +102,6 @@ void int_radix_sort(struct clip *cp) {
     i = i + 1;
   }
   source[i] = cp;
-  // @ERROR missing the last node from the original linked list
-  // printf("%i\n", source[i]->views);
 
   int n = i;
 
@@ -161,10 +161,10 @@ void print_lst(struct clip *cp) {
   while(cp->next != NULL){
     cp = cp->next;
     printf("%i\n", cp->views);
-    
-    // printf("%s\n", cp->user);
-    // printf("%s\n", cp->duration);
-    // printf("%s\n", cp->title);
+    printf("%s\n", cp->user);
+    printf("%s\n", cp->duration);
+    printf("%s\n", cp->title);
+    printf("%s\n", "============");
     
   }
 }
