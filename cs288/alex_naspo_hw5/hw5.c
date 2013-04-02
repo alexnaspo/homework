@@ -29,8 +29,7 @@ struct clip {
 int main(int argc, char **argv) {
   char filename[LINE_LENGTH];
   build_lsts(*(argv+1));  /* filename prefix */
-  // printf("%s\n", "here");
-  //print_lsts(hourly);
+  print_lsts(hourly);
   //  sort_lsts(); /* sort hourly in descending order of views */
   //  print_lsts(hourly);
   return 0;
@@ -82,10 +81,9 @@ void build_lsts(char *prefix) {
   i=0;
   while (fscanf(fp,"%s",filename) == 1) {
     // printf("%s\n", filename);
-printf("%s\n", "=======new list=========");    
     hourly[i] = build_a_lst(filename);
     i++;
-    print_a_lst(hourly[i]);
+    // print_a_lst(hourly[i]);
   }
   fclose(fp);
 }
@@ -169,14 +167,13 @@ struct clip *insert_at_end(struct clip *hp,char **five) {
   cp = hp;
   if(hp == NULL){
      hp = tp;
-     printf("%s\n", "head is null");
   } else {
     while(cp->next != NULL){
       cp = cp->next;
     }
     cp->next = tp;
   }
-  print_a_lst(hp);
+  // print_a_lst(hp);
   
   return hp;
 }
