@@ -9,10 +9,11 @@ function get_youtube(){
     duration=`expr "$x" : ".*data-context-item-time=\"\([0-9:]*\)\".*"`
     title=`expr "$x" : ".*data-context-item-title=\"\([^\"]*\)\".*"`
     echo ${views//,/}','$user','$duration','${title//,/"M_CM"}
-  done > "youtube/"$date".txt"
+  done > "index-"$date".txt"
 }
-x=1
-while [[ $x -le 50 ]]; do
+
+x=0
+while [[ $x -le 60 ]]; do
   date=`(date +"%Y-%m-%d-%H-%M")`
   echo $date
   get_youtube $date
