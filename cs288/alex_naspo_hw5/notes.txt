@@ -1,0 +1,2 @@
+* sort by first value.
+* end up with sorted array of pointers to sorted linked lists of clips

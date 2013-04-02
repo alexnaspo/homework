@@ -103,7 +103,7 @@ void int_radix_sort(struct clip *cp) {
 
   int n = i;
 
-  while (rnd <= n){
+  while (rnd < n - 1 ){
     if (flag == 0) {
       radix_wrapper(source, dest, n, rnd);
       flag = 1;  
@@ -113,12 +113,6 @@ void int_radix_sort(struct clip *cp) {
     }  
     rnd = rnd + 1;
   }
-  // cp = head;
-  // while(head){
-  //   head->next = source[i];
-  //   head++;
-  //   i++;
-  // }
 
   // re-link clips
   head = source[0];
@@ -161,12 +155,13 @@ void radix_wrapper(struct clip *source[], struct clip *dest[], int n, int rnd){
 }
 /* prints all the users */
 void print_lst(struct clip *cp) {
+  printf("%i\n", cp->views);
   while(cp->next != NULL){
     cp = cp->next;
     printf("%i\n", cp->views);
-    // printf("%s\n", cp->user);
-    // printf("%s\n", cp->duration);
-    // printf("%s\n", cp->title);
+    printf("%s\n", cp->user);
+    printf("%s\n", cp->duration);
+    printf("%s\n", cp->title);
     printf("%s\n", "============");
     
   }
