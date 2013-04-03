@@ -40,13 +40,11 @@ void sort_lsts() {
   struct clip *cp, *tp;
   struct clip *source[999];
   struct clip *dest[999];
-
-  int i;
-  int j;
+  int flag, rnd, n, i, j;
   for ( j = 0; j < 60; ++j)
   {
-    int flag = 0;
-    int rnd = 0;
+    flag = 0;
+    rnd = 0;
     i=0;
     cp = hourly[j];
     while(cp->next != NULL){
@@ -54,10 +52,8 @@ void sort_lsts() {
       cp = cp->next;
       i++;
     }
-
-    int n = i;
-
-    while (rnd < n - 1 ){
+    n = i + 1;
+    while (rnd < 32){
       if (flag == 0) {
         int_radix_sort(rnd, n, source, dest);
         flag = 1;  
@@ -68,34 +64,40 @@ void sort_lsts() {
       rnd++;
     }
     int k;
-    // printf("%s\n", "=========ORIG=====");
-    // cp = hourly[j];
-    // while(cp->next != NULL){
-    //   printf("%i\n", cp->views);
-    //   cp = cp->next;
-    // }
-    //printf("%s\n", "=========show array=====");
-    // hourly[j]->next = NULL;
-    cp = source[0];
+    cp = source[n-1];
     hourly[j] = cp;
-    for (k = 1; k < 33; k++)
-    {
-      cp->next = source[k];
+    for (k = 32; k >= 0; k--)
+    { 
+      // printf("%s\n", "+++++++");
+      // printf("%i\n", k);
       // printf("%i\n", source[k]->views);
+      // printf("%s\n", "+++++++");
+      cp->next = source[k];
       cp = cp->next;
     }
     cp->next = NULL;
 
-
-    // printf("%s\n", "=========AFTER=====");
-    // cp = hourly[j];
-
-    // while(cp->next != NULL){
-    //   printf("%i\n", cp->views);
-    //   cp = cp->next;
-    // }
-
   }
+
+  rnd = 0;
+  n=60;
+  while (rnd < 32 ){
+    if (flag == 0) {
+      int_radix_sort(rnd, n, hourly, dest);
+      flag = 1;  
+    } else {
+      int_radix_sort(rnd, n, dest, hourly);
+      flag = 0;
+    }  
+    rnd++;
+  }
+  printf("%s\n", "=====FINAL====");
+  for ( i = 0; i < 60; ++i)
+  {
+    printf("%i\n", hourly[i]->views);
+  }
+  printf("%s\n", "=====FINAL====");
+
 
   /* 
      sort individual lists in descending order of views
@@ -249,8 +251,6 @@ struct clip *insert_at_end(struct clip *hp,char **five) {
   tp->title = malloc(strlen(five[3]));
   strcpy(tp->title, five[3]);
   
-  //@ERROR head is null every time
-  // Am I passing the value wrong?
   cp = hp;
   if(hp == NULL){
      hp = tp;
@@ -270,12 +270,15 @@ void print_a_lst(struct clip *cp) {
      use a while loop and the statement below to print the list
      printf("%d,%s,%s,%s,%s\n",cp->views,cp->user,cp->id,cp->title,cp->time);
   */
+  int i = 0;
   printf("%s\n", "===== print a lst =======" );
   while(cp->next != NULL){
     printf("%i\n", cp->views);
     //printf("%d,%s,%s,%s\n",cp->views,cp->user,cp->title,cp->time);
     cp = cp->next;
+    i++;
   }
+  printf("%i\n", i);
   printf("%s\n", "===== end print a lst ====" );
 
 }
