@@ -38,8 +38,8 @@ int main(int argc, char **argv) {
 
 void sort_lsts() {
   struct clip *cp, *tp;
-  struct clip *source[999];
-  struct clip *dest[999];
+  struct clip *source[256];
+  struct clip *dest[256];
   int flag, rnd, n, i, j;
   for ( j = 0; j < 60; ++j)
   {
@@ -52,45 +52,32 @@ void sort_lsts() {
       cp = cp->next;
       i++;
     }
-    n = i + 1;
-    while (rnd < 32){
-      if (flag == 0) {
-        int_radix_sort(rnd, n, source, dest);
-        flag = 1;  
-      } else {
-        int_radix_sort(rnd, n, dest, source);
-        flag = 0;
-      }  
-      rnd++;
-    }
+
+    int_radix_sort(0,i, source, dest);
+    int_radix_sort(1,i, dest, source);
+    int_radix_sort(2,i, source, dest);
+    int_radix_sort(3,i, dest, source);
+
     int k;
-    cp = source[n-1];
+    cp = source[i -1];
     hourly[j] = cp;
-    for (k = 32; k >= 0; k--)
+    for (k = i - 2; k >= 0; k--)
     { 
-      // printf("%s\n", "+++++++");
-      // printf("%i\n", k);
-      // printf("%i\n", source[k]->views);
-      // printf("%s\n", "+++++++");
       cp->next = source[k];
-      cp = cp->next;
+      if(k == 0)
+        cp->next = NULL;
+      else
+        cp = cp->next;
     }
-    cp->next = NULL;
-
   }
 
-  rnd = 0;
-  n=60;
-  while (rnd < 32 ){
-    if (flag == 0) {
-      int_radix_sort(rnd, n, hourly, dest);
-      flag = 1;  
-    } else {
-      int_radix_sort(rnd, n, dest, hourly);
-      flag = 0;
-    }  
-    rnd++;
-  }
+  n = 60;
+  // put in loop
+  int_radix_sort(0,n, hourly, dest);
+  int_radix_sort(1,n, dest, hourly);
+  int_radix_sort(2,n, hourly, dest);
+  int_radix_sort(3,n, dest, hourly);  
+
   printf("%s\n", "=====FINAL====");
   for ( i = 0; i < 60; ++i)
   {
@@ -112,20 +99,14 @@ void sort_lsts() {
 }
 
 void int_radix_sort(int rnd, int n, struct clip *source[], struct clip *dest[]){
-  int cnt[9999];
-  int map[9999];
-  int mask = 255;
+  int cnt[256];
+  int map[256];
   int i;
-
-  for (i = 0; i < 256; ++i)
-  { 
-    map[i] = 0;
-    cnt[i] = 0;
-  }
-  
+  memset(cnt, 0, sizeof(cnt));
+  map[0]=0;
   for (i = 0; i < n; i++)
   {
-    cnt[(source[i]->views >> (8 * rnd)) & mask]++;
+    cnt[((source[i]->views) >> (8 * rnd)) & 255]++;
   }
 
   for (i = 1; i < 256; i++) {   
@@ -133,7 +114,7 @@ void int_radix_sort(int rnd, int n, struct clip *source[], struct clip *dest[]){
   }  
 
   for (i = 0; i < n; i++) {
-    dest[map[(source[i]->views >> (8 * rnd)) & mask]++] = source[i];  
+    dest[map[((source[i]->views)>> (8 * rnd)) & 255]++] = source[i];  
   }  
 }
 
@@ -190,7 +171,6 @@ struct clip *build_a_lst(char *fn) {
     while (fgets(line, LINE_LENGTH, fp) != NULL) {
       split_line(&fields, line);
       hp = insert_at_end(hp, fields);  /* insert a user at end of the list */
-
     }
     fclose (fp);
   }
