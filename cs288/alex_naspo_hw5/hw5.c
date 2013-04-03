@@ -30,12 +30,73 @@ int main(int argc, char **argv) {
   char filename[LINE_LENGTH];
   build_lsts(*(argv+1));  /* filename prefix */
   print_lsts(hourly);
-  //  sort_lsts(); /* sort hourly in descending order of views */
-  //  print_lsts(hourly);
+  printf("%s\n", "=======SORT=========");
+  sort_lsts(); /* sort hourly in descending order of views */
+  print_lsts(hourly);
   return 0;
 }
 
 void sort_lsts() {
+  struct clip *cp, *tp;
+  struct clip *source[999];
+  struct clip *dest[999];
+
+  int i;
+  int j;
+  for ( j = 0; j < 60; ++j)
+  {
+    int flag = 0;
+    int rnd = 0;
+    i=0;
+    cp = hourly[j];
+    while(cp->next != NULL){
+      source[i] = cp;
+      cp = cp->next;
+      i++;
+    }
+
+    int n = i;
+
+    while (rnd < n - 1 ){
+      if (flag == 0) {
+        int_radix_sort(rnd, n, source, dest);
+        flag = 1;  
+      } else {
+        int_radix_sort(rnd, n, dest, source);
+        flag = 0;
+      }  
+      rnd++;
+    }
+    int k;
+    // printf("%s\n", "=========ORIG=====");
+    // cp = hourly[j];
+    // while(cp->next != NULL){
+    //   printf("%i\n", cp->views);
+    //   cp = cp->next;
+    // }
+    //printf("%s\n", "=========show array=====");
+    // hourly[j]->next = NULL;
+    cp = source[0];
+    hourly[j] = cp;
+    for (k = 1; k < 33; k++)
+    {
+      cp->next = source[k];
+      // printf("%i\n", source[k]->views);
+      cp = cp->next;
+    }
+    cp->next = NULL;
+
+
+    // printf("%s\n", "=========AFTER=====");
+    // cp = hourly[j];
+
+    // while(cp->next != NULL){
+    //   printf("%i\n", cp->views);
+    //   cp = cp->next;
+    // }
+
+  }
+
   /* 
      sort individual lists in descending order of views
      such that the first clip in each list will have the highest views
@@ -46,6 +107,32 @@ void sort_lsts() {
      this one is again the same as HW4 except now that you use values from the first clip of each list
 
   */
+}
+
+void int_radix_sort(int rnd, int n, struct clip *source[], struct clip *dest[]){
+  int cnt[9999];
+  int map[9999];
+  int mask = 255;
+  int i;
+
+  for (i = 0; i < 256; ++i)
+  { 
+    map[i] = 0;
+    cnt[i] = 0;
+  }
+  
+  for (i = 0; i < n; i++)
+  {
+    cnt[(source[i]->views >> (8 * rnd)) & mask]++;
+  }
+
+  for (i = 1; i < 256; i++) {   
+    map[i] = map[i-1] + cnt[i-1];
+  }  
+
+  for (i = 0; i < n; i++) {
+    dest[map[(source[i]->views >> (8 * rnd)) & mask]++] = source[i];  
+  }  
 }
 
 /* use print_a_lst(struct clip *cp); */
