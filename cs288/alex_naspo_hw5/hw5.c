@@ -40,11 +40,10 @@ void sort_lsts() {
   struct clip *cp, *tp;
   struct clip *source[256];
   struct clip *dest[256];
-  int flag, rnd, n, i, j;
+  int flag, n, i, j;
   for ( j = 0; j < 60; ++j)
   {
     flag = 0;
-    rnd = 0;
     i=0;
     cp = hourly[j];
     while(cp->next != NULL){
@@ -52,12 +51,14 @@ void sort_lsts() {
       cp = cp->next;
       i++;
     }
-
+    
+    // put in loop add to radix sort function
     int_radix_sort(0,i, source, dest);
     int_radix_sort(1,i, dest, source);
     int_radix_sort(2,i, source, dest);
     int_radix_sort(3,i, dest, source);
 
+    // re-link clips
     int k;
     cp = source[i -1];
     hourly[j] = cp;
@@ -72,7 +73,7 @@ void sort_lsts() {
   }
 
   n = 60;
-  // put in loop
+  // put in loop add to radix sort function
   int_radix_sort(0,n, hourly, dest);
   int_radix_sort(1,n, dest, hourly);
   int_radix_sort(2,n, hourly, dest);
@@ -98,15 +99,16 @@ void sort_lsts() {
   */
 }
 
-void int_radix_sort(int rnd, int n, struct clip *source[], struct clip *dest[]){
+void int_radix_sort(int byte, int n, struct clip *source[], struct clip *dest[]){
   int cnt[256];
   int map[256];
   int i;
   memset(cnt, 0, sizeof(cnt));
   map[0]=0;
+
   for (i = 0; i < n; i++)
   {
-    cnt[((source[i]->views) >> (8 * rnd)) & 255]++;
+    cnt[((source[i]->views) >> (8 * byte)) & 255]++;
   }
 
   for (i = 1; i < 256; i++) {   
@@ -114,7 +116,7 @@ void int_radix_sort(int rnd, int n, struct clip *source[], struct clip *dest[]){
   }  
 
   for (i = 0; i < n; i++) {
-    dest[map[((source[i]->views)>> (8 * rnd)) & 255]++] = source[i];  
+    dest[map[((source[i]->views)>> (8 * byte)) & 255]++] = source[i];  
   }  
 }
 
