@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   print_lst(head);    /* prints the table */
   int_radix_sort(head);
   printf("%s\n", "=====SORT=====");
-  print_lst(head);    /* prints the table but now sorted */
+  // print_lst(head);    /* prints the table but now sorted */
   return 0;
 }
 
@@ -86,79 +86,68 @@ void int_radix_sort(struct clip *cp) {
     you will need a wrapper here for radix_sort only, without having to involve
     struct clip or linked list
   */
-  struct clip *dest[9999];
-  struct clip *source[9999];
+  int dest[9999];
+  int source[9999];
   int i = 0;
   int flag = 0;
-  int rnd = 0;
-  i = 1;
+  i = 0;
 
-  source[0] = cp;
+  // source[0] = cp->views;
   while(cp->next != NULL){
+    source[i] = cp->views;
     cp = cp->next;
-    source[i] = cp;
-    i = i + 1;
+    i++;
   }
-  source[i] = cp;
+  source[i] = cp->views;
 
   int n = i;
 
-  while (rnd <= n){
-    if (flag == 0) {
-      radix_wrapper(source, dest, n, rnd);
-      flag = 1;  
-    } else {
-      radix_wrapper(dest, source, n, rnd);
-      flag = 0;
-    }  
-    rnd = rnd + 1;
+  radix_wrapper(0,n, source, dest);
+  radix_wrapper(1,n, dest, source);
+  radix_wrapper(2,n, source, dest);
+  radix_wrapper(3,n, dest, source); 
+
+  printf("%s\n", "done sort");
+  for ( i = 0; i < 32; i++)
+  {
+    printf("%i\n", source[i]);
   }
-  // cp = head;
-  // while(head){
-  //   head->next = source[i];
-  //   head++;
-  //   i++;
-  // }
 
   // re-link clips
-  head = source[0];
-  cp = head;
-  for ( i = 1; i <= n; i++)
-  {
-    cp->next = source[i];
-    if (i == n)
-      cp->next = NULL;
-    else
-      cp = cp->next;  
-  }
+  // head = source[0];
+  // cp = head;
+  // for ( i = 1; i <= n; i++)
+  // {
+  //   cp->next = source[i];
+  //   if (i == n)
+  //     cp->next = NULL;
+  //   else
+  //     cp = cp->next;  
+  // }
 }
 
-void radix_wrapper(struct clip *source[], struct clip *dest[], int n, int rnd){
+void radix_wrapper(int byte, int n, int source[], int dest[]){
   int i;
-  int cnt[9999];
-  int map[9999];
-  int bucket = 256;
-  int mask = bucket - 1;
+  int cnt[256];
+  int map[256];
 
-  for (i = 0; i < bucket; ++i)
-  { 
-    map[i] = 0;
-    cnt[i] = 0;
-  }
+  memset(cnt, 0, sizeof(cnt));
+  map[0]=0;
 
   for (i = 0; i < n; i++)
   {
-    cnt[(source[i]->views >> 8 * rnd) & mask]++;
+    cnt[(source[i] >> (8 * byte)) & 255]++;
   }
 
-  for (i = 1; i < bucket; i++) {   
+  for (i = 1; i < 256; i++) {   
     map[i] = map[i-1] + cnt[i-1];
   }  
 
   for (i = 0; i < n; i++) {
-    dest[map[(source[i]->views >> (8 * rnd)) & mask]++] = source[i];  
+    dest[map[(source[i] >> (8 * byte)) & 255]++] = source[i];  
   }
 }
+
 /* prints all the users */
 void print_lst(struct clip *cp) {
   while(cp->next != NULL){

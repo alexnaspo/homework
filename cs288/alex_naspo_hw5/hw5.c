@@ -5,7 +5,7 @@
 
 #define LINE_LENGTH 200
 #define MAX_CLIPS 100
-void print_a_line(),print_a_clip(),print_a_lst(),print_lsts();
+void print_a_line(),print_a_clip(),print_a_lst(),print_lsts(), print_final_list();
 void split_line();
 
 void build_lsts();
@@ -33,6 +33,10 @@ int main(int argc, char **argv) {
   printf("%s\n", "=======SORT=========");
   sort_lsts(); /* sort hourly in descending order of views */
   print_lsts(hourly);
+  printf("%s\n", "=======END SORT=========");
+  printf("%s\n", "=======PRINT FINAL LIST=========");
+  print_final_list(hourly);
+  printf("%s\n", "=======PRINT FINAL LIST=========");
   return 0;
 }
 
@@ -46,17 +50,20 @@ void sort_lsts() {
     flag = 0;
     i=0;
     cp = hourly[j];
+    
     while(cp->next != NULL){
       source[i] = cp;
       cp = cp->next;
       i++;
     }
     
-    // put in loop add to radix sort function
-    int_radix_sort(0,i, source, dest);
-    int_radix_sort(1,i, dest, source);
-    int_radix_sort(2,i, source, dest);
-    int_radix_sort(3,i, dest, source);
+    for(n = 0; n < 4; n++){
+      if(n % 2 == 0){
+        int_radix_sort(n,i, source, dest);
+      } else {
+        int_radix_sort(n,i, dest, source);
+      }
+    }
 
     // re-link clips
     int k;
@@ -73,20 +80,16 @@ void sort_lsts() {
   }
 
   n = 60;
-  // put in loop add to radix sort function
-  int_radix_sort(0,n, hourly, dest);
-  int_radix_sort(1,n, dest, hourly);
-  int_radix_sort(2,n, hourly, dest);
-  int_radix_sort(3,n, dest, hourly);  
 
-  printf("%s\n", "=====FINAL====");
-  for ( i = 0; i < 60; ++i)
-  {
-    printf("%i\n", hourly[i]->views);
+  for(i=0; i < 4; i++){
+    if (i % 2 == 0){
+      int_radix_sort(i,n, hourly, dest);  
+    } else {
+      int_radix_sort(i,n, dest, hourly);  
+    }
+    
   }
-  printf("%s\n", "=====FINAL====");
-
-
+  
   /* 
      sort individual lists in descending order of views
      such that the first clip in each list will have the highest views
@@ -122,9 +125,6 @@ void int_radix_sort(int byte, int n, struct clip *source[], struct clip *dest[])
 
 /* use print_a_lst(struct clip *cp); */
 void print_lsts(struct clip **lst) {
-  // FILL IN
-  // ...
-  // FILL IN
   int i;
   for (i = 0; i < 60; ++i)
   {
@@ -152,10 +152,8 @@ void build_lsts(char *prefix) {
   /* read output from command */
   i=0;
   while (fscanf(fp,"%s",filename) == 1) {
-    // printf("%s\n", filename);
     hourly[i] = build_a_lst(filename);
     i++;
-    // print_a_lst(hourly[i]);
   }
   fclose(fp);
 }
@@ -242,7 +240,6 @@ struct clip *insert_at_end(struct clip *hp,char **five) {
     }
     cp->next = tp;
   }
-  // print_a_lst(hp);
   
   return hp;
 }
@@ -255,14 +252,20 @@ void print_a_lst(struct clip *cp) {
   int i = 0;
   printf("%s\n", "===== print a lst =======" );
   while(cp->next != NULL){
-    printf("%i\n", cp->views);
-    //printf("%d,%s,%s,%s\n",cp->views,cp->user,cp->title,cp->time);
+    printf("%d,%s,%s,%s\n",cp->views,cp->user,cp->title,cp->time);
     cp = cp->next;
     i++;
   }
-  printf("%i\n", i);
   printf("%s\n", "===== end print a lst ====" );
 
+}
+
+void print_final_list(struct clip *hourly[]){
+  int i;
+  for ( i = 0; i < 60; ++i)
+  {
+    printf("%d,%s,%s,%s\n",hourly[i]->views,hourly[i]->user,hourly[i]->title,hourly[i]->time);
+  }
 }
 
 /* end */
