@@ -135,6 +135,7 @@ void print_lsts(struct clip **lst) {
 /* prefix can be such as: index-2013-03-01-12 
   the directory will have 60 files with the above prefix */
 void build_lsts(char *prefix) {
+
   FILE *fp;
   char *cmd;
   char *filename;
@@ -244,6 +245,10 @@ struct clip *insert_at_end(struct clip *hp,char **five) {
 }
 
 void print_a_lst(struct clip *cp) {
+  /* 
+     use a while loop and the statement below to print the list
+     printf("%d,%s,%s,%s,%s\n",cp->views,cp->user,cp->id,cp->title,cp->time);
+  */
   int i = 0;
   printf("%s\n", "===== print a lst =======" );
   while(cp->next != NULL){

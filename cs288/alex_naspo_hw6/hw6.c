@@ -30,30 +30,38 @@ char strategy[10];
 int TRUE = 1;
 int FALSE = 0;
 int goal_found(),expand_a_node(),nodes_same(),find_h(),count();
-void up(),dn(),lt(),rt(),swap(),print_a_node(),print_nodes();
+int up(),dn(),lt(),rt();
+void swap(),print_a_node(),print_nodes();
 int flag;
 
 int main(int argc,char **argv) {
+
   int iter,cnt,total;
   struct node *tsucc,*csucc,*copen,*topen,*open,*closed,*succ;
 
   open=closed=succ=NULL;
+
   start=initialize(argc,argv);  /* init initial and goal states */
   open=start; 
-  iter=0; total=1;
+  iter=0; total=1;  
+  printf("%s\n", "========START=========");
   while (open!=NULL) {    /* Termination cond is tested in expand. */
       copen=open;
       open=open->next; /* get the first node from open to expand */
       succ=expand(copen);       /* Find new successors */
       succ=filter(open,succ);   /* New succ list */
       succ=filter(closed,succ); /* New succ list */
-      if (goal_found(succ,goal)==TRUE) break;
+      if (goal_found(succ,goal)==TRUE){
+        printf("%s\n", "WIN!");
+        break;
+      } 
       cnt=count(succ);
       total=total+cnt;
       if (succ!=NULL) open=merge(succ,open,flag); /* New open list */
       copen->next=closed;
       closed=copen;   /* New closed */
       iter++;
+      printf("%s\n", "------END ROUND----");
    }
    printf("%s strategy: %d iterations %d nodes\n",strategy,iter,total);
    return 0;
@@ -99,60 +107,113 @@ struct node *insert_by_h(struct node *succ,struct node *open) {
 struct node *expand(struct node *selected) {
   int i,j,k,cnt,succ_buf[BF][N+1][N];
   struct node *cp,*tp,*expanded;
-  //.....
+  cp = selected;
+  for (i = 0; i < N; i++){
+    for (j = 0; j < N; j++){
+      for (k = 0; k < N; k++){
+        succ_buf[i][j][k] = cp->loc[j][k];
+      }
+    }
+  }  
+  for (i = 0; i < N; ++i) {
+    for (j = 0; j < N; ++j) {
+      if(selected->loc[i][j] == 0) break; //found zero
+    }
+    if(selected->loc[i][j] == 0) break; //found zero
+  }
+  
+  cnt = 0;
+  if(dn(i, j)) {
+    swap(i,j,i+1,j,0, succ_buf);
+    cnt++;
+  } 
+
+  if(rt(i, j)) {
+    swap(i,j,i,j+1,cnt, succ_buf);
+    cnt++;
+  }
+
+  if(up(i, j)) {
+    swap(i,j,i-1,j,cnt, succ_buf);
+    cnt++;
+  }
+
+  if(lt(i, j)) {
+    swap(i,j,i,j-1,cnt, succ_buf);
+    cnt++;
+  }
+  expanded = selected;
+  for (i = 0; i < cnt; i++){
+    tp = malloc(sizeof(struct node));
+    // tp->next = NULL;
+    for (j = 0; j < N; j++){
+      for (k = 0; k < N; k++){        
+        tp->loc[j][k] = succ_buf[i][j][k];
+      }
+    }
+    tp->next = expanded;
+    expanded = tp;
+  }    
+  // print_nodes(expanded);
+
   return expanded;
 }
 
 int expand_a_node(int node[N+1][N],int succ_buf[BF][N+1][N]) {
   int i,j,cnt,found,g_val,h_val;
-  //...
+
+  
   return cnt;     /* number of nodes expanded */
 }
 
 /* 0 goes down by a row */
-// down = i +1;
-// if(0 <= i + 1 <= N) sudo
 // then create a node this should be a function returning a temp ptr
-void dn(int i,int j,int index,int succ_buf[BF][N+1][N]){
-  //...
+int dn(int i,int j){ //swap here
+  return((0 < i + 1) && (i + 1 < N));
 }
 
 /* 0 goes right by a column */
-// right = j +1;
-// if(0 <= j + 1 <= N) sudo
-// then create a node
-void rt(int i,int j,int index,int succ_buf[BF][N+1][N]){
-  //...
+int rt(int i,int j){
+  return ((0 < j + 1) && (j + 1 < N));
+
 }
 
 /* 0 goes up by a row */
-// up = i - 1;
-// if(0 <= j - 1 <= N) sudo
-// then create a node
-void up(int i,int j,int index,int **succ_buf){
-  //...
+int up(int i,int j){
+  return((0 < i - 1) && (i - 1 < N));
+
 }
 
 /* 0 goes left by a column */
-// right = j - 1;
-// if(0 <= j - 1 <= N) sudo
-// then create a node
-void lt(int i,int j,int index,int succ_buf[BF][N+1][N]){
-  //...
+int lt(int i,int j){
+  return((0 < j - 1) && (j - 1 < N));
 }
 
 void swap(int i,int j,int k,int l,int index,int succ_buf[BF][N+1][N]){
-  //...
+  int temp = succ_buf[index][i][j];
+  succ_buf[index][i][j] = succ_buf[index][k][l];
+  succ_buf[index][k][l] = temp;
 }
 
 struct node *filter(struct node *hp,struct node *succ){ 
-  //...
+  // if any nodes in succ are in hp, then remove them
   return succ;
 }
 
-int nodes_same(int *a,int *b) {
+int nodes_same(int a[N+1][N],int b[N+1][N]) {
   int i=0,flg=FALSE;
-  //...
+  int j;
+
+  for (i = 0; i < N; ++i) {
+    for (j = 0; j < N; ++j) {
+      if(a[i][j] != b[i][j]) {
+        flg = FALSE;
+        break;
+      } else{
+        flg = TRUE;
+      } 
+    }
+  }
   return flg;
 }
 
@@ -195,6 +256,7 @@ struct node *initialize(int argc, char **argv){
   tp->next=NULL;
   goal=tp; 
   printf("goal state\n"); print_a_node(goal);
+  printf("%s\n", "======================");
 
   strcpy(strategy,argv[idx]);
   if (strcmp(argv[idx],"dfs")) flag=DFS;
