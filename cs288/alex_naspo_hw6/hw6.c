@@ -77,12 +77,12 @@ printf("\t\t\t\t\t%s\n\n", "**************END CURRENT OPEN**********************
         printf("%s\n", "WIN!");
         break;
       } 
-      // cnt=count(succ);
-      // total=total+cnt;
+      cnt=count(succ);
+      total=total+cnt;
       if (succ!=NULL) {
         // printf("%s\n", "new open");
         open=merge(succ,open,flag); /* New open list */
-//               printf("\t\t\t\t\t%s\n\n", "************** OPEN************************");                      
+
 // print_nodes(open);
 // printf("\t\t\t\t\t%s\n\n", "**************OPEN************************");  
       }
@@ -92,6 +92,7 @@ printf("\t\t\t\t\t%s\n\n", "**************END CURRENT OPEN**********************
 // print_a_node(copen);
 // printf("\t\t\t\t\t%s\n", "**************END CLOSED************************");                            
       iter++;
+      printf("%i\n", iter);
       // printf("\t\t\t\t\t%s\n", "**************END ROUND************************");
       // sleep(1);
    }
@@ -119,33 +120,40 @@ int count(struct node *succ) {
 
 struct node *merge(struct node *succ,struct node *open,int flag) {
   struct node *csucc,*copen;
-  csucc = succ;
+  // printf("\t\t\t\t\t%s\n\n", "************** OPEN IN MERGER************************");                      
+  // print_nodes(open);
+  // printf("\t\t\t\t\t%s\n\n", "************** OPEN IN MERGER************************");                      
   if (flag==DFS) {  /* attach to the front: succ -> ... -> open */
+    csucc = succ;
     printf("%s\n", "FLAG DFS");
     while(csucc->next != NULL){
       csucc = csucc->next;
     }
-// printf("\t\t\t\t\t%s\n\n", "************** OPEN IN MERGER************************");                      
-// print_a_node(csucc);
-// printf("\t\t\t\t\t%s\n\n", "**************OPEN IN MERGER************************");      
-    if(csucc == NULL){
-      csucc = open;
-    } else {
-      csucc->next = open;  
-    }
+  // printf("\t\t\t\t\t%s\n\n", "************** OPEN IN MERGER************************");                      
+  // print_a_node(csucc);
+  // printf("\t\t\t\t\t%s\n\n", "**************OPEN IN MERGER************************");      
     
+    csucc->next = open;  
     open = succ;
-// printf("\t\t\t\t\t%s\n\n", "************** OPEN IN MERGER************************");                      
-// print_nodes(succ);
-// printf("\t\t\t\t\t%s\n\n", "**************OPEN IN MERGER************************");  
-// print_a_node(csucc);
-// printf("\t\t\t\t\t%s\n\n", "**************OPEN IN MERGER************************");  
-  }else if (flag==BFS) { /* attach to the end: open -> ... -> succ */
+    // print_nodes(open);
+  } else if (flag==BFS) { /* attach to the end: open -> ... -> succ */
     printf("%s\n", "FLAG BFS");
-    //.....
+    copen = open;
+    if(copen == NULL){
+      open = succ;
+    } else {
+      while(copen->next != NULL){
+        copen = copen->next;
+      }
+      copen->next = succ;      
+    }    
+
   }else {       /* Best first: insert in asc order of h value */
-    printf("%s\n", "FLAG BEST");
+    // printf("%s\n", "FLAG BEST");
   }
+  // printf("\t\t\t\t\t%s\n\n", "************** AFTER IN MERGER************************");                      
+  // print_nodes(open);
+  // printf("\t\t\t\t\t%s\n\n", "************** AFTER IN MERGER************************");   
   return open;
 }
 
@@ -165,13 +173,21 @@ struct node *expand(struct node *selected) {
         succ_buf[i][j][k] = cp->loc[j][k];
       }
     }
-  }  
-  for (i = 0; i < N; ++i) {
-    for (j = 0; j < N; ++j) {
-      if(selected->loc[i][j] == 0) break; //found zero
+  }
+  int row, collumn;
+  for (i = 0; i < N; i++) {
+    for (j = 0; j < N; j++) {
+      if(selected->loc[i][j] == 0){
+        row = i;
+        collumn = j;
+        break;
+      }  //found zero
     }
     if(selected->loc[i][j] == 0) break; //found zero
   }
+  i = row;
+  j = collumn;
+  
   
   cnt = 0;
   if(dn(i, j)) {
@@ -190,8 +206,10 @@ struct node *expand(struct node *selected) {
     swap(i,j,i,j-1,cnt, succ_buf);
     cnt++;
   }
+  if(cnt > 4) exit(0);
   expanded = NULL;
   for (i = 0; i < cnt; i++){
+    // printf("%i\n", i);
     tp = malloc(sizeof(struct node));
     // tp->next = NULL;
     for (j = 0; j < N; j++){
@@ -199,10 +217,11 @@ struct node *expand(struct node *selected) {
         tp->loc[j][k] = succ_buf[i][j][k];
       }
     }
+    
     tp->next = expanded;
     expanded = tp;
-  }    
-  // print_nodes(expanded);
+  }
+  
 
   return expanded;
 }
@@ -223,13 +242,11 @@ int dn(int i,int j){ //swap here
 /* 0 goes right by a column */
 int rt(int i,int j){
   return ((0 < j + 1) && (j + 1 < N));
-
 }
 
 /* 0 goes up by a row */
 int up(int i,int j){
   return((0 <= i - 1) && (i - 1 < N));
-
 }
 
 /* 0 goes left by a column */
@@ -238,8 +255,10 @@ int lt(int i,int j){
 }
 
 void swap(int i,int j,int k,int l,int index,int succ_buf[BF][N+1][N]){
+  // printf("I:%i J:%i K:%i L:%i  IJVAL:%i KLVALE:%i\n",i,j,k,l, succ_buf[index][i][j], succ_buf[index][k][l]);
   int temp = succ_buf[index][i][j];
   succ_buf[index][i][j] = succ_buf[index][k][l];
+  // printf("I:%i J:%i K:%i L:%i  IJVAL:%i KLVALE:%i\n",i,j,k,l, succ_buf[index][i][j], succ_buf[index][k][l]);
   succ_buf[index][k][l] = temp;
 }
 
@@ -260,18 +279,12 @@ struct node *filter(struct node *hp,struct node *succ){
       cp=cp->next;
     }
     if (cp==NULL) {
-      // flg=FALSE;
+      // No match
       arr[cnt] = sp;
       cnt++;
-      // printf("%s\n", "NO match");
-
-      // tp->next = sp->next;
-      // sp = tp->next;
     } else {
-        // flg= TRUE;
-      // printf("%s\n", "MATCH");
+      // match
     }
-    // tp = sp;
     sp = sp->next;
   }
   if(cnt > 0){
@@ -353,9 +366,13 @@ struct node *initialize(int argc, char **argv){
   printf("%s\n", "======================");
 
   strcpy(strategy,argv[idx]);
-  if (strcmp(argv[idx],"dfs")) flag=DFS;
-  else if (strcmp(argv[idx],"bfs")) flag = BFS;
-  else flag=BEST;
+  if (strcmp(argv[idx],"dfs") == 0){
+    flag=DFS; 
+  } else if (strcmp(argv[idx],"bfs") == 0){
+    flag = BFS;
+  } else {
+    flag=BEST;
+  }
 
   return start;
 }
