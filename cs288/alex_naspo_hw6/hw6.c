@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define BF 4      /* Branching factor of the search tree */
 #define N 4     /* fix to fifteen puzzle but should be */
@@ -32,6 +33,7 @@ int FALSE = 0;
 int goal_found(),expand_a_node(),nodes_same(),find_h(),count();
 int up(),dn(),lt(),rt();
 void swap(),print_a_node(),print_nodes();
+int calc_misplaced(), calc_h();
 int flag;
 
 int main(int argc,char **argv) {
@@ -42,59 +44,43 @@ int main(int argc,char **argv) {
   open=closed=succ=NULL;
 
   start=initialize(argc,argv);  /* init initial and goal states */
+  start->loc[4][0] = calc_h(start);
   open=start; 
-  iter=0; total=1;  
+  iter=0; total=1;
+
   
   while (open!=NULL) {    /* Termination cond is tested in expand. */      
-    // printf("\t\t\t\t\t%s\n\n", "**************START ROUND************************");
       copen=open;
       open=open->next; /* get the first node from open to expand */                                 
 
-// printf("\t\t\t\t\t%s\n\n", "************** OPEN LIST************************");                      
-// print_nodes(open);
-// printf("\t\t\t\t\t%s\n\n", "************** OPEN LIST************************");    
-
 printf("\t\t\t\t\t%s\n\n", "**************CURRENT OPEN************************");                      
 print_a_node(copen);
+printf("%i\n", copen->loc[4][0]);
 printf("\t\t\t\t\t%s\n\n", "**************END CURRENT OPEN************************");  
 
       succ=expand(copen);       /* Find new successors */
-
-// printf("\t\t\t\t\t%s\n\n", "**************AFTER EXPAND************************");                      
-// print_nodes(succ);
-// printf("\t\t\t\t\t%s\n\n", "**************END EXPAND************************");                      
-      
-// printf("\t\t\t\t\t%s\n\n", "**************AFTER FILTER ONE************************");                      
 
       succ=filter(open,succ);   /* New succ list */
 
       succ=filter(closed,succ); /* New succ list */
 
-// print_nodes(succ);
-// printf("\t\t\t\t\t%s\n\n", "**************END FILTER TWO************************");     
-
       if (goal_found(succ,goal)==TRUE){
-        printf("%s\n", "WIN!");
+        printf("%s\n", "=====WIN!=====");
+        print_nodes(succ);
+        printf("%s\n", "=====WIN!=====");
         break;
       } 
       cnt=count(succ);
+      // printf("%i\n", cnt);
       total=total+cnt;
       if (succ!=NULL) {
         // printf("%s\n", "new open");
         open=merge(succ,open,flag); /* New open list */
-
-// print_nodes(open);
-// printf("\t\t\t\t\t%s\n\n", "**************OPEN************************");  
       }
       copen->next=closed;
       closed=copen;   /* New closed */
-// printf("\t\t\t\t\t%s\n", "**************CLOSED************************");                      
-// print_a_node(copen);
-// printf("\t\t\t\t\t%s\n", "**************END CLOSED************************");                            
       iter++;
-      printf("%i\n", iter);
-      // printf("\t\t\t\t\t%s\n", "**************END ROUND************************");
-      // sleep(1);
+      // printf("%i\n", iter);
    }
    printf("%s strategy: %d iterations %d nodes\n",strategy,iter,total);
    return 0;
@@ -119,25 +105,20 @@ int count(struct node *succ) {
 }
 
 struct node *merge(struct node *succ,struct node *open,int flag) {
-  struct node *csucc,*copen;
-  // printf("\t\t\t\t\t%s\n\n", "************** OPEN IN MERGER************************");                      
-  // print_nodes(open);
-  // printf("\t\t\t\t\t%s\n\n", "************** OPEN IN MERGER************************");                      
+  struct node *csucc,*copen, *temp[count(succ)];
+  int i,j;
   if (flag==DFS) {  /* attach to the front: succ -> ... -> open */
     csucc = succ;
-    printf("%s\n", "FLAG DFS");
+    // printf("%s\n", "FLAG DFS");
     while(csucc->next != NULL){
       csucc = csucc->next;
-    }
-  // printf("\t\t\t\t\t%s\n\n", "************** OPEN IN MERGER************************");                      
-  // print_a_node(csucc);
-  // printf("\t\t\t\t\t%s\n\n", "**************OPEN IN MERGER************************");      
+    }   
     
     csucc->next = open;  
     open = succ;
     // print_nodes(open);
   } else if (flag==BFS) { /* attach to the end: open -> ... -> succ */
-    printf("%s\n", "FLAG BFS");
+    // printf("%s\n", "FLAG BFS");
     copen = open;
     if(copen == NULL){
       open = succ;
@@ -147,20 +128,43 @@ struct node *merge(struct node *succ,struct node *open,int flag) {
       }
       copen->next = succ;      
     }    
+  } else {       /* Best first: insert in asc order of h value */
+    csucc = succ;
+    i = 0;
+    while(csucc->next != NULL){      
+      temp[i++] = csucc;
+      csucc = csucc->next;
+    }
+    temp[i++] = csucc;
 
-  }else {       /* Best first: insert in asc order of h value */
-    // printf("%s\n", "FLAG BEST");
+    for (j = 0; j < i; j++){
+      temp[j]->next = NULL;
+      open = insert_by_h(temp[j], open);
+    }
   }
-  // printf("\t\t\t\t\t%s\n\n", "************** AFTER IN MERGER************************");                      
-  // print_nodes(open);
-  // printf("\t\t\t\t\t%s\n\n", "************** AFTER IN MERGER************************");   
+
+
   return open;
 }
 
 /* insert succ into open in ascending order of H value */
-struct node *insert_by_h(struct node *succ,struct node *open) {
-  //......
-  return open;
+struct node *insert_by_h(struct node *new_node,struct node *head) {
+  struct node *cp,*tp;
+  if(head == NULL || head->loc[4][0] >= new_node->loc[4][0]){
+    new_node->next = head;
+    head = new_node;
+  } else {
+    cp = head;
+    while(cp->next != NULL && cp->next->loc[4][0] < new_node->loc[4][0]){      
+      // printf("%i\n", cp->loc[4][0]);
+      cp = cp->next;
+      
+    }
+    new_node->next = cp->next;
+    cp->next = new_node;  
+  }  
+
+  return head;
 }
 
 struct node *expand(struct node *selected) {
@@ -217,6 +221,7 @@ struct node *expand(struct node *selected) {
         tp->loc[j][k] = succ_buf[i][j][k];
       }
     }
+    tp->loc[4][0] = calc_h(tp);
     
     tp->next = expanded;
     expanded = tp;
@@ -340,6 +345,68 @@ void print_a_node(struct node *np) {
   }
   printf("\n");
 }
+
+int calc_misplaced(struct node *np) {
+  int i,j, (*mp)[N];
+  int cnt, misplaced;
+  misplaced = 0;
+  cnt = 1;
+  mp = np->loc;
+  for (i=0;i<N;i++) {
+    for (j=0;j<N;j++) {
+      if(np->loc[i][j] == cnt){
+        //printf("arr-%i cnt-%i %s\n", np->loc[i][j], cnt, "match");
+      } else {
+        //printf("%s\n", "no match");
+        misplaced++;
+      }
+      cnt++;
+    }
+  }
+  // printf("%i\n", misplaced);
+  // printf("\n");
+  return misplaced;
+}
+
+// Calculate manhattan distance
+// this can probably be done cleaner
+int calc_h(struct node *np) {
+  int i,j, x, y, (*mp)[N], (*gs)[N];
+  int cnt, h, xi, yi;
+  h = 0;
+  cnt = 1;
+  mp = np->loc;
+  gs = goal->loc;
+
+  int xidx, yidx, xtemp;
+  xidx = yidx = 0;
+  for (i = 0; i < N; ++i) {
+    xidx=0;
+    for (j = 0; j < N; ++j) {    
+      if(mp[i][j] == gs[xidx][yidx]) {        
+        //match
+      } else{
+        //no match, calculate the distance from this number
+        for (y = 0; y < N; y++) {
+          for (x = 0; x < N; x++) {
+            if(mp[y][x] == gs[yidx][xidx]){
+              xtemp = fabs(y - yidx) + fabs(x - xidx);
+              h+= fabs(y - yidx) + fabs(x - xidx);
+              break; //found match
+            } 
+          }
+          if(mp[i][j] == gs[xidx][yidx]) break;
+        }
+      } 
+      xidx++;
+    }
+    yidx++;
+  }  
+  return h;
+}
+
+
+
 
 struct node *initialize(int argc, char **argv){
   int i,j,k,idx;

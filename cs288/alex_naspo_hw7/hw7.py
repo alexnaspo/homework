@@ -72,7 +72,7 @@ def extract_values(dm):
         lst.append(item)
     return lst
 
-# mysql> describe most_active;
+
 def insert_to_db(l, tbl):
     db = MySQLdb.connect(host="localhost", user="root", passwd="", db="stocks")
     c = db.cursor()
@@ -92,16 +92,11 @@ def insert_to_db(l, tbl):
         db.commit()
     c.close()
     db.close()
-    print "DB function"
-   # ............
 
-
-# show databases;
-# show tables;
 
 def to_dict(l):
-    keys = ['symbol','title','price','diff','perc_diff','volume']
-    d = [dict(zip(keys,x)) for x in l]
+    keys = ['symbol', 'title', 'price', 'diff', 'perc_diff', 'volume']
+    d = [dict(zip(keys, x)) for x in l]
     return d
 
 
@@ -121,11 +116,9 @@ def main():
     lst = to_dict(lst)
     cursor = insert_to_db(lst, fn)  # fn = table name for mysql
 
-    # l = select_from_db(cursor, fn)  # display the table on the screen
 
     # make sure the Apache web server is up and running
     # write a PHP script to display the table(s) on your browser
-
     # return xml
     return True
     # end of main()

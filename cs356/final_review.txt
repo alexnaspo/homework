@@ -1,0 +1,30 @@
+Problems on test
+
+All concepts he mentioned would definitely be on exam
+
+*chapter 4 problem P45 - reverse path forwarding; center based tree
+*chapter 5 problem P6
+*chapter 5 problem 11a,b,c,d
+*chap 5 p20a  
+*chap 5 P23
+  -memorize minimum frame length formula
+  -memorize efficiency forumla
+
+*hierarchical routing
+
+*RIP
+-distance vector algo
+-poise and reverse
+  -explain the count to infinity problem****
+
+*OSPF (open sortest path first)
+  -dijksra
+  -open link state algorithm
+
+  **Hierarchical OSPF
+
+
+*BGP- Border gateway Protocol
+  -semi permanent TCP connection
+  -set up a connection between two routers and keep it open
+  
