@@ -14,7 +14,7 @@ All concepts he mentioned would definitely be on exam
 
 *RIP
 -distance vector algo
--poise and reverse
+-poisen reverse
   -explain the count to infinity problem****
 
 *OSPF (open sortest path first)
@@ -23,8 +23,7 @@ All concepts he mentioned would definitely be on exam
 
   **Hierarchical OSPF
 
-
 *BGP- Border gateway Protocol
   -semi permanent TCP connection
   -set up a connection between two routers and keep it open
-  
+    

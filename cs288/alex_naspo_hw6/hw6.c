@@ -44,7 +44,8 @@ int main(int argc,char **argv) {
   open=closed=succ=NULL;
 
   start=initialize(argc,argv);  /* init initial and goal states */
-  start->loc[4][0] = calc_h(start);
+  start->loc[4][2] = calc_h(start);
+  start->loc[4][1] = 0;
   open=start; 
   iter=0; total=1;
 
@@ -53,10 +54,10 @@ int main(int argc,char **argv) {
       copen=open;
       open=open->next; /* get the first node from open to expand */                                 
 
-printf("\t\t\t\t\t%s\n\n", "**************CURRENT OPEN************************");                      
 print_a_node(copen);
-printf("%i\n", copen->loc[4][0]);
-printf("\t\t\t\t\t%s\n\n", "**************END CURRENT OPEN************************");  
+// printf("%i\n", copen->loc[4][0]);
+// printf("%i\n",copen->loc[4][2]);
+// printf("%i\n",copen->loc[4][1]);
 
       succ=expand(copen);       /* Find new successors */
 
@@ -71,16 +72,13 @@ printf("\t\t\t\t\t%s\n\n", "**************END CURRENT OPEN**********************
         break;
       } 
       cnt=count(succ);
-      // printf("%i\n", cnt);
       total=total+cnt;
       if (succ!=NULL) {
-        // printf("%s\n", "new open");
         open=merge(succ,open,flag); /* New open list */
       }
       copen->next=closed;
       closed=copen;   /* New closed */
       iter++;
-      // printf("%i\n", iter);
    }
    printf("%s strategy: %d iterations %d nodes\n",strategy,iter,total);
    return 0;
@@ -221,7 +219,12 @@ struct node *expand(struct node *selected) {
         tp->loc[j][k] = succ_buf[i][j][k];
       }
     }
-    tp->loc[4][0] = calc_h(tp);
+
+    tp->loc[4][2] = calc_h(tp);
+    tp->loc[4][1] = selected->loc[4][1] + 1;
+
+    // Manhattan distance is weighted double
+    tp->loc[4][0] = tp->loc[4][1] + (2 * tp->loc[4][2]);
     
     tp->next = expanded;
     expanded = tp;
@@ -296,16 +299,12 @@ struct node *filter(struct node *hp,struct node *succ){
     succ = arr[0];
     arr[cnt -1]->next = NULL;
     np = succ;
-    // printf("%s\n", "AFTER");
-    // print_a_node(arr[0]);
     for (i = 1; i < cnt; ++i)
     {
       np->next = arr[i];
       np = np->next;
-      // print_a_node(arr[i]);
     }
-    // print_nodes(succ);
-    // printf("%s\n", "END AFTER");
+
   } else {
     succ = NULL;
   }
@@ -357,14 +356,11 @@ int calc_misplaced(struct node *np) {
       if(np->loc[i][j] == cnt){
         //printf("arr-%i cnt-%i %s\n", np->loc[i][j], cnt, "match");
       } else {
-        //printf("%s\n", "no match");
         misplaced++;
       }
       cnt++;
     }
   }
-  // printf("%i\n", misplaced);
-  // printf("\n");
   return misplaced;
 }
 
@@ -404,9 +400,6 @@ int calc_h(struct node *np) {
   }  
   return h;
 }
-
-
-
 
 struct node *initialize(int argc, char **argv){
   int i,j,k,idx;

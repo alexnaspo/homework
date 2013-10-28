@@ -155,7 +155,7 @@ void build_lsts(char *prefix) {
     i++;
   }
   fclose(fp);
-}
+  }
 
 /* open the file, read one line at a time, split and insert */
 struct clip *build_a_lst(char *fn) {
